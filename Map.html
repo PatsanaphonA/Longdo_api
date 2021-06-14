@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+  <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Create Map Sample | Longdo Map</title>
+        <link rel="stylesheet" type="text/css" href="mystyle.css">
+        <script type="text/javascript" src="https://api.longdo.com/map/?key=79badaa029ca818f48903f88b17d9984"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+        <script>
+            var lon;
+            var lat;
+            var map;
+            function init() {
+              map = new longdo.Map({
+                layer: [
+                    //Layers    
+                    longdo.Layers.NORMAL,
+                ],
+                zoom: 7,
+                
+                placeholder: document.getElementById('map'),
+                lastView: false,
+              });
+              //wgs84
+              //lon and lat
+            var zone47N = new longdo.Rectangle({ lon: 96, lat: 84 }, { width: 6, height: 84 }, { label: '47N', fillColor: false });
+            var zone48N = new longdo.Rectangle({ lon: 102, lat: 84 }, { width: 6, height: 84 }, { label: '48N', fillColor: false });
+            var zoneW = longdo.Util.boundOfGeohash('w');
+            zoneW = new longdo.Rectangle({ lon: zoneW.minLon, lat: zoneW.maxLat }, longdo.Util.sizeOfBound(zoneW), { label: 'w', fillColor: false });
+                
+            map.Overlays.add(zoneW);   
+            map.Overlays.add(zone47N);
+            map.Overlays.add(zone48N);
+              
+            map.Event.bind('mousemove', function() {
+                var location = map.location(longdo.LocationMode.Pointer);
+                if (location) {
+                    document.getElementById('lat').innerHTML = new Number(location.lat).toFixed(6);
+                    document.getElementById('lon').innerHTML = new Number(location.lon).toFixed(6);
+                }
+            }),
+
+              //Marker Bus
+              /*
+              map.Event.bind('overlayClick', function(overlay) {
+                }  );
+              var marker1 = new longdo.Marker({ lon: 100.41, lat: 13.84 },
+                {
+                title: 'Rotate Marker',
+                    icon: {
+                    url: 'https://map.longdo.com/mmmap/images/pin_mark.png',
+                    offset: { x: 12, y: 45 }
+                    },
+                visibleRange:{min:7 , max:9},
+                });
+                //not start yet
+                function addtruck(){
+                }
+                */
+            //Marker Route
+                map.Route.placeholder(document.getElementById('Route'));
+                var Marker = new longdo.Marker(
+                    { lon: 100.634086, lat: 13.638175 },
+                    { title: 'My home', detail: 'I\'m here' }
+                ); // Create Marker Overlay
+                map.Route.add(Marker);
+                map.Route.placeholder(document.getElementById('route'));
+                map.Route.add({ lon: 101.226655, lat: 13.225180 });
+                map.Route.search();
+                map.Route.enableContextMenu();
+                map.Route.auto(true);
+                
+                //Enter search
+                search = document.getElementById('search');
+                suggest = document.getElementById('suggest');
+                map.Search.placeholder(
+                document.getElementById('result')
+                );
+                search.onkeyup = function(event){
+                if((event || window.event).keyCode != 13)
+                return;
+                doSearch();
+                };
+
+                suggest.style.display = 'none';
+
+                search.oninput = function() {
+                    if (search.value.length < 3) {
+                        suggest.style.display = 'none';
+                        return;
+                    }
+                    map.Search.suggest(search.value, {
+                    area: 50,
+                    });
+                };
+
+            map.Event.bind('suggest', function(result) {
+            if (result.meta.keyword != search.value) return;
+            
+            suggest.innerHTML = '';
+            for (var i = 0, item; item = result.data[i]; ++i) {
+                longdo.Util.append(suggest, 'a', {
+                innerHTML: item.d,
+                href: 'javascript:doSuggest(\'' + item.w + '\')'
+                });
+            }
+            suggest.style.display = 'flex';
+            });
+                
+            
+            }//OverLayers zone
+            function doSearch() {
+                map.Search.search(search.value, {
+                    area: 50,
+            });
+            }
+
+            function doSuggest(value) {
+            search.value = value;
+            doSearch();
+            }
+            //Geometries
+              /*map.Overlays.add(marker);
+              map.Overlays.add(circle);
+              map.Overlays.add(geom);
+              map.Overlays.add(rectangle);*/
+
+            //outoffunction init
+
+            //Geometries
+            /*var circle = new longdo.Circle({
+            lon: 101, lat: 15
+            }, 1, {
+            lineWidth: 2,
+            lineColor: 'rgba(255, 0, 0, 0.8)',
+            fillColor: 'rgba(255, 0, 0, 0.4)'
+            });
+            var locationList = [
+            { lon: 100, lat: 20 },
+            { lon: 100, lat: 6 }
+            ];
+            var geom = new longdo.Polyline(locationList);
+            
+            var rectangle = new longdo.Rectangle({
+            lon: 97, lat: 17
+            }, {
+            width: 2, height: 1
+            }, {
+            editable: false
+            });*/
+
+            function check(val){
+                i = document.getElementById(val).innerText;
+                switch(i){
+                    case "Normal":
+                    map.Layers.setBase(longdo.Layers.NORMAL);
+                    break;
+                    case "Gray":
+                    map.Layers.setBase(longdo.Layers.GRAY);
+                    break;
+                    case "Reverse":
+                    map.Layers.setBase(longdo.Layers.REVERSE);
+                    break;
+                    case "Poi":
+                    map.Layers.setBase(longdo.Layers.POI);
+                    break;
+                    case "Political":
+                    map.Layers.setBase(longdo.Layers.POLITICAL);
+                    break;
+            }
+        }
+
+            //checkbox testing not finish yet
+            function boxcheck(){
+                c = document.getElementById('Traffic');
+                if(c.checked){
+                    map.Layers.add(longdo.Layers.TRAFFIC);
+                }
+                else{
+                    map.Layers.remove(longdo.Layers.TRAFFIC);
+                }
+            }
+            
+            function boxcheck2(){
+                a = document.getElementById('Cameras');
+                if(a.checked){
+                    map.Overlays.load(longdo.Overlays.cameras);
+                }
+                else{
+                    map.Overlays.unload(longdo.Overlays.cameras);
+                }
+            }
+
+            function boxcheck3(){
+                b = document.getElementById('Events');
+                if(b.checked){
+                map.Overlays.load(longdo.Overlays.events);
+                }
+                else{
+                    map.Overlays.unload(longdo.Overlays.events);
+                }
+            }
+
+            /*function TextInput(val) {
+                g = document.getElementById('zoom').value = val; 
+                console.log(g)
+            }*/
+
+            function sli(val) {
+                var slider = document.getElementById("zoom").innerHTML = val;
+                map.zoom(slider,true)
+                console.log(slider);
+                    }
+          </script>
+    </head>
+    <body onload = "init();">
+        <div id = "map"></div>
+        <div id = "option">Select map type:</div>
+        <label for = "type"></label>
+        <select name = "type" onchange = "check(this.value)" id = "MAPLAY">
+            <option value = "NORMAL" id = "NORMAL">Normal</option>    
+            <option value = "GRAY" id = "GRAY">Gray</option>
+            <option value = "REVERSE" id = "REVERSE">Reverse</option>
+            <option value = "POI" id = "POI">Poi</option>
+            <option value = "POLITICAL" id = "POLITICAL">Political</option>
+        </select>
+
+        <div>
+        <input type = "checkbox" onchange = "boxcheck()" id = "Traffic" value = "TRAFFIC">
+        <label for = "TRAFFIC">Traffic</label><br>
+        <input type = "checkbox" onchange = "boxcheck2()" id = "Cameras" value = "CAMERAS">
+        <label for = "CAMERAS">Cameras</label><br>
+        <input type = "checkbox" onchange = "boxcheck3()" id = "Events" value = "EVENTS">
+        <label for = "EVENTS">Events</label></div>
+        <div>
+        <input type="button" onclick = "" id = "Crosshair" value = "Crosshair location">
+        </div>
+        <div id = "wgs84" class="result">
+        lat : <span id = "lat">0</span>
+        <br>
+        lon : <span id = "lon">0</sppn>
+        </div>
+        <div>
+        <input type = "button" id = "JUMP!" value = "JUMP!">
+        </div>
+        <div>
+        <input type = "button" id = "Where am I?" value = "Where am I?">
+        </div>
+        ZoOm!
+        <div>
+        <input id = "zoom" type = "range" min = "1" max = "20" value = "10" class = "slider" oninput="sli(this.value)">
+        </div>
+            <input type = "search" id = "search" list = "suggest" autofocus = "autofocus">
+            <select name = "type" onchange = "LANGUAGE">
+                <option value = "TH">TH</option>
+                <option value = "EN">EN</option>
+            </select>
+            <button id = "submit" onchange = "">Search</button>
+        <div id = "boxsscript">
+            <div id = "suggest"></div>
+            <div id="result"></div>
+        </div>
+    </body> 
+  </html>

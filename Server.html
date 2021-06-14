@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, td, th {
+  border: 1px solid black;
+  padding: 5px;
+}
+
+th {text-align: left;}
+</style>
+</head>
+<body>
+
+<?php
+
+    $myfile = fopen("RealWorldExercise.php", "r") or die("Unable to open file!");
+    fread($myfile,filesize("RealWorldExercise.php"));
+    
+echo "<table>
+<tr>
+<th>Id</th>
+<th>Lat</th>
+<th>Lon</th>
+</tr>";
+while($row = mysqli_fetch_array($result)) {
+  echo "<tr>";
+  echo "<td>" . $row['Id'] . "</td>";
+  echo "<td>" . $row['Lat'] . "</td>";
+  echo "<td>" . $row['Lon'] . "</td>";
+  echo "</tr>";
+}
+echo "</table>";
+fclose($myfile);
+?>
+</body>
+</html>

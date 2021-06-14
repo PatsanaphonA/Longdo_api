@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+        <meta charset="UTF-8">
+        <title>Create Map Sample | Longdo Map</title>
+        <script type="text/javascript" src="https://api.longdo.com/map/?key=79badaa029ca818f48903f88b17d9984"></script>
+        <style type="text/css">
+
+html {
+  height: 100%;
+}
+body {
+  margin: 0px;
+  height: 90%;
+}
+#map {
+  height: 100%;
+}
+#ta{
+  text-align: center;
+  border: 2px solid black;
+}
+
+</style>
+        <script>
+          function init() {
+            var map = new longdo.Map({
+              zoom: 17,
+                placeholder: document.getElementById('map')
+                ,lastView : false
+            });
+        var x = 0;
+        var y = 0;
+        var lonNum;
+        var latNum;
+        var obj;
+          function loadDoc(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET","http://usermap.longdo.com/montri/MM-Exercise/RealWorldExercise.php",true);
+            xhttp.onreadystatechange = function(){
+                if(xhttp.readyState == 4 && xhttp.status == 200){
+                  obj = xhttp.responseText;
+                  obj = JSON.parse(obj);
+                }
+            };
+            xhttp.send(null);
+          }
+          loadDoc();
+          setInterval(myTime,2000);
+          function myTime(){
+            console.log(obj[x][y]);
+            Get_Name(x,y);
+          }
+          function Get_Name(x,y){
+              map.Overlays.clear();
+            document.getElementById("Demo").innerHTML = obj[x][y].imei + ' , ' + obj[x][y].tst 
+              + ' , ' + obj[x][y].acc + ' , ' + obj[x][y].lon + ' , ' + obj[x][y].lat;
+              Get_marker(lonNum = obj[x][y].lon,latNum = obj[x][y].lat);
+              Get_Plus();
+          }
+
+        function Get_marker(lonNum,latNum){
+         var marker = new longdo.Marker({lon: lonNum, lat: latNum},{
+            title: 'Marker',
+            icon:{
+            url:"https://www.pngrepo.com/png/236709/180/delivery-truck-truck.png",
+            offset: {x: 85,y: 125}
+            },visibleRange:{ min:16,max:17},
+          });
+          map.Overlays.add(marker);
+          map.location({ lon:lonNum, lat:latNum}, true);
+        }
+        function Get_Plus(){
+          y++;
+        }
+      }
+        
+        //imei , tst, acc , lat , lon
+        //field *id* ,date ,id ,lat ,lon
+        </script>
+  </head>
+  <body onload="init();">
+      <div id = "map"></div>
+      <p id = "Demo"></p> 
+  </body>
+</html>
